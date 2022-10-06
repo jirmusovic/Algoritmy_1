@@ -85,8 +85,11 @@ void List_Init( List *list ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  **/
 void List_Dispose( List *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
-
+	for(; list->firstElement != NULL; list->firstElement = list->activeElement){   //posledni prvek odkazuje na NULL
+		list->activeElement = list->firstElement->nextElement;
+		free(list->firstElement);													//mazani prvku odpredu
+	}
+	list->activeElement = NULL;
 }
 
 /**
@@ -128,7 +131,11 @@ void List_First( List *list ) {
  * @param dataPtr Ukazatel na cílovou proměnnou
  */
 void List_GetFirst( List *list, int *dataPtr ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(list->firstElement != NULL){			   //prvek je aktivni
+		*dataPtr = list->firstElement->data;   //dereference
+	} else {
+		List_Error();
+	}
 }
 
 /**
@@ -139,7 +146,13 @@ void List_GetFirst( List *list, int *dataPtr ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 void List_DeleteFirst( List *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(list->firstElement != NULL){
+		ListElementPtr tmp;
+		tmp = list->firstElement;
+		list->firstElement = list->firstElement->nextElement;
+		free(tmp);
+	}
+	
 }
 
 /**
@@ -189,7 +202,11 @@ void List_InsertAfter( List *list, int data ) {
  * @param dataPtr Ukazatel na cílovou proměnnou
  */
 void List_GetValue( List *list, int *dataPtr ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(list->activeElement != NULL){			//prvek je aktivni
+		*dataPtr = list->activeElement->data;   //dereference
+	} else {
+		List_Error();
+	}
 }
 
 /**
@@ -200,7 +217,9 @@ void List_GetValue( List *list, int *dataPtr ) {
  * @param data Nová hodnota právě aktivního prvku
  */
 void List_SetValue( List *list, int data ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(list->activeElement != NULL){		//prvek je aktivni
+		list->activeElement->data = data;   //vkladame data
+	}
 }
 
 /**
@@ -211,7 +230,9 @@ void List_SetValue( List *list, int data ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 void List_Next( List *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(list->activeElement != NULL){
+		list->activeElement = list->activeElement->nextElement;
+	}
 }
 
 /**
@@ -221,8 +242,7 @@ void List_Next( List *list ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 int List_IsActive( List *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
-	return 0;
+	return list->activeElement;
 }
 
 /* Konec c201.c */
