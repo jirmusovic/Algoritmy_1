@@ -73,8 +73,8 @@ void List_Error() {
  * @param list Ukazatel na strukturu jednosměrně vázaného seznamu
  */
 void List_Init( List *list ) {
-	list->activeElement = NULL;
-	list->firstElement = NULL;
+	list->activeElement = NULL;		
+	list->firstElement = NULL;		// Inicializace prvního a aktivního elementu - vložení nulové hodnoty
 }
 
 /**
@@ -85,11 +85,11 @@ void List_Init( List *list ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  **/
 void List_Dispose( List *list ) {
-	for(; list->firstElement != NULL; list->firstElement = list->activeElement){   //posledni prvek odkazuje na NULL
-		list->activeElement = list->firstElement->nextElement;
-		free(list->firstElement);													//mazani prvku odpredu
+	for(; list->firstElement != NULL; list->firstElement = list->activeElement){    // Dokud nebudeme na posledním prvku (ten odkazuje na null), 
+		list->activeElement = list->firstElement->nextElement;						// 					přidělujeme prvnímu prvku aktivní prvek
+		free(list->firstElement);													// Mazání prvků od prvního prvku
 	}
-	list->activeElement = NULL;
+	list->activeElement = NULL;														// Vrací do stavu po inicializaci
 }
 
 /**
@@ -101,16 +101,13 @@ void List_Dispose( List *list ) {
  * @param data Hodnota k vložení na začátek seznamu
  */
 void List_InsertFirst( List *list, int data ) {
-	ListElementPtr tmp = malloc(sizeof(struct ListElement));
-		if(tmp == NULL){
+	ListElementPtr tmp = malloc(sizeof(struct ListElement));	// Alokace paměti pro nový prvek
+		if(tmp == NULL){										// Nutné ověření alokace paměti
 			List_Error();
 		} 
-	tmp->data = data;
-	tmp->nextElement = list->firstElement;
-	list->firstElement = tmp;
-	
-	//printf("first %d\n", list->firstElement->data)	;
-
+	tmp->data = data;											// Vložení hodnoty data do dočasné peoměnné
+	tmp->nextElement = list->firstElement;						// Přesunutí prvního prvku na další - děláme místo pro nový prvek
+	list->firstElement = tmp;									// Vložení hodnoty data na místo nového prvního prvku
 }
 
 /**
@@ -120,7 +117,7 @@ void List_InsertFirst( List *list, int data ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 void List_First( List *list ) {
-	list->activeElement = list->firstElement;	
+	list->activeElement = list->firstElement;	// Nastavení aktivity seznamu na první prvek
 }
 
 /**
@@ -131,9 +128,9 @@ void List_First( List *list ) {
  * @param dataPtr Ukazatel na cílovou proměnnou
  */
 void List_GetFirst( List *list, int *dataPtr ) {
-	if(list->firstElement != NULL){			   //prvek je aktivni
-		*dataPtr = list->firstElement->data;   //dereference
-	} else {
+	if(list->firstElement != NULL){			   // Ověření, zda je prvek aktivní
+		*dataPtr = list->firstElement->data;   // Dereferenční přiřazení hodnoty dat z prvního prvku
+	} else {								   // List je prázdný
 		List_Error();
 	}
 }
@@ -146,11 +143,11 @@ void List_GetFirst( List *list, int *dataPtr ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 void List_DeleteFirst( List *list ) {
-	if(list->firstElement != NULL){
-		ListElementPtr tmp;
-		tmp = list->firstElement;
-		list->firstElement = list->firstElement->nextElement;
-		free(tmp);
+	if(list->firstElement != NULL){								// Pouze aktivní seznam
+		ListElementPtr tmp;								
+		tmp = list->firstElement;								// Uložení prvního prvku do dočasné proměnné
+		list->firstElement = list->firstElement->nextElement;   // Posunutí prvního prvku na další prvek
+		free(tmp);												// Smazání původního prvního prvku
 	}
 	
 }
@@ -164,11 +161,11 @@ void List_DeleteFirst( List *list ) {
  */
 void List_DeleteAfter( List *list ) {
 	struct ListElement *tmp;
-	if(list->activeElement != NULL){								//ověření, zda je seznam aktivní
-		if(list->activeElement->nextElement != NULL){				//zjistíme, zda je co rušit
-			tmp = list->activeElement->nextElement;					//nastavíme ukazatel na prvek, který chceme zrušit
-			list->activeElement->nextElement = tmp->nextElement;	//přesuneme se na další prvek
-			free(tmp);												//uvolníme paměť užívanou rušeným prvkem
+	if(list->activeElement != NULL){								// Ověření, zda je seznam aktivní
+		if(list->activeElement->nextElement != NULL){				// Zjistíme, zda je co rušit
+			tmp = list->activeElement->nextElement;					// Nastavení ukazatele na prvek, který chceme zrušit
+			list->activeElement->nextElement = tmp->nextElement;	// Přesunutí na další prvek
+			free(tmp);												// Uvolnění paměti užívanou rušeným prvkem
 		}
 	}
 }
@@ -183,14 +180,14 @@ void List_DeleteAfter( List *list ) {
  * @param data Hodnota k vložení do seznamu za právě aktivní prvek
  */
 void List_InsertAfter( List *list, int data ) {
-	if(list->activeElement != NULL){
-		struct ListElement *tmp = malloc(sizeof(struct ListElement));
-			if(tmp == NULL){
+	if(list->activeElement != NULL){									// Ověření, zda je seznam aktivní
+		struct ListElement *tmp = malloc(sizeof(struct ListElement));	// Alokace paměti pro nový prvek
+			if(tmp == NULL){											// Nutné ověření správné alokace
 				List_Error();
 			}
-		tmp->data = data;
-		tmp->nextElement = list->activeElement->nextElement;
-		list->activeElement->nextElement = tmp;
+		tmp->data = data;												// Vložení hodnoty data do dočasné peoměnné
+		tmp->nextElement = list->activeElement->nextElement;			
+		list->activeElement->nextElement = tmp;							// Vložení nového prvku za aktivní prvek
 	}
 }
 
@@ -202,8 +199,8 @@ void List_InsertAfter( List *list, int data ) {
  * @param dataPtr Ukazatel na cílovou proměnnou
  */
 void List_GetValue( List *list, int *dataPtr ) {
-	if(list->activeElement != NULL){			//prvek je aktivni
-		*dataPtr = list->activeElement->data;   //dereference
+	if(list->activeElement != NULL){			// Pouze pro aktivní seznam
+		*dataPtr = list->activeElement->data;   // Dereferenční vložení hodnoty aktivního prvku do parametru
 	} else {
 		List_Error();
 	}
@@ -217,8 +214,8 @@ void List_GetValue( List *list, int *dataPtr ) {
  * @param data Nová hodnota právě aktivního prvku
  */
 void List_SetValue( List *list, int data ) {
-	if(list->activeElement != NULL){		//prvek je aktivni
-		list->activeElement->data = data;   //vkladame data
+	if(list->activeElement != NULL){		// Pouze pro aktivní seznam
+		list->activeElement->data = data;   // Přepsání dat aktivního prvku
 	}
 }
 
@@ -230,8 +227,8 @@ void List_SetValue( List *list, int data ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 void List_Next( List *list ) {
-	if(list->activeElement != NULL){
-		list->activeElement = list->activeElement->nextElement;
+	if(list->activeElement != NULL){								// Pouze pro aktivní seznam
+		list->activeElement = list->activeElement->nextElement;		// Posunutí aktivity na další prvek
 	}
 }
 
@@ -242,7 +239,7 @@ void List_Next( List *list ) {
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
 int List_IsActive( List *list ) {
-	return list->activeElement != NULL;
+	return list->activeElement != NULL;  // Porovnání s nulovou hodnotou, vrací 1, pokud je list aktivní, jinak 0
 }
 
 /* Konec c201.c */
